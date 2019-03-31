@@ -10,7 +10,6 @@
             });
     return params;
   }
-
   var links = $(".courses:first").children();
   for (var x = 0; x < links.length; x++){
     links[x] = getUrlParams($(links[x]).find("a")[0].href);
@@ -18,9 +17,9 @@
      url:"https://culearn.carleton.ca/moodle/grade/report/user/index.php?id="+links[x]['id'],
      success: function(data){
         var fullTable = $(data).find("tbody")[0].innerHTML;
-        var remove = $(fullTable).find(".text_to_html");
+        var remove = $(fullTable).find(".column-feedback");
         for (var x = 0; x < remove.length; x++){
-          fullTable = fullTable.replace(remove[x], "");
+          fullTable = fullTable.replace(remove[x].innerHTML, "");
         }
         document.getElementById("GradesTable").innerHTML +=  "<table>"+ fullTable + "</table><div style = \"width:100%; border-bottom: 1px solid black;\"></div>";
         }
