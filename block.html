@@ -2,30 +2,34 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 <script>
-  function getUrlParams(url) {
-    let params = {};
-    url.substring(1).replace(/[?&]+([^=&]+)=([^&]*)/gi,
-            function (str, key, value) {
-                 params[key] = value;
+    function getUrlParams(url) {
+        let params = {};
+        url.substring(1).replace(/[?&]+([^=&]+)=([^&]*)/gi,
+            function(str, key, value) {
+                params[key] = value;
             });
-    return params;
-  }
+        return params;
+    }
 
-  let links = $(".courses:first").children();
-  for (let x = 0; x < links.length; x++){
-    links[x] = getUrlParams($(links[x]).find("a")[0].href);
-    links[x] = $.ajax({
-     url:"https://culearn.carleton.ca/moodle/grade/report/user/index.php?id="+links[x]['id'],
-     success: function(data){
-        if ( $(data).find("div#graded_users_selector").length == 0){
-          let fullTable = $(data).find("tbody")[0].innerHTML;
-          let remove = $(fullTable).find(".text_to_html");
-          for (let x = 0; x < remove.length; x++){
-            fullTable = fullTable.replace(remove[x], "");
-          }
-          document.getElementById("GradesTable").innerHTML +=  "<table>"+ fullTable + "</table><div style = \"width:100%; border-bottom: 1px solid black;\"></div>";
-          }
-        }
-    });
-  }
+    let links = $(".courses:first").children();
+    for (let x = 0; x < links.length; x++) {
+        links[x] = getUrlParams($(links[x]).find("a")[0].href);
+        links[x] = $.ajax({
+            url: "https://culearn.carleton.ca/moodle/grade/report/user/index.php?id=" + links[x]['id'],
+            success: function(data) {
+                if ($(data).find("div#graded_users_selector").length == 0) {
+                    let fullTable = $(data).find("tbody")[0].innerHTML;
+                    let remove = $(fullTable).find(".text_to_html");
+                    let feedback = $(fullTable).find(".column-feedback");
+                    for (let x = 0; x < feedback.length; x++) {
+                        fullTable = fullTable.replace(feedback[x].innerHTML, "");
+                    }
+                    for (let x = 0; x < remove.length; x++) {
+                        fullTable = fullTable.replace(remove[x], "");
+                    }
+                    document.getElementById("GradesTable").innerHTML += "<table>" + fullTable + "</table><div style = \"width:100%; border-bottom: 1px solid black;\"></div>";
+                }
+            }
+        });
+    }
 </script>
