@@ -1,35 +1,82 @@
+<select id="semesters"></select>
 <div id="GradesTable"></div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 <script>
-    function getUrlParams(url) {
-        let params = {};
-        url.substring(1).replace(/[?&]+([^=&]+)=([^&]*)/gi,
-            function(str, key, value) {
-                params[key] = value;
+  function getUrlParams(url) {
+    let params = {};
+    url.substring(1).replace(/[?&]+([^=&]+)=([^&]*)/gi,
+            function (str, key, value) {
+                 params[key] = value;
             });
-        return params;
-    }
+    return params;
+  }
 
-    let links = $(".courses:first").children();
-    for (let x = 0; x < links.length; x++) {
-        links[x] = getUrlParams($(links[x]).find("a")[0].href);
-        links[x] = $.ajax({
-            url: "https://culearn.carleton.ca/moodle/grade/report/user/index.php?id=" + links[x]['id'],
-            success: function(data) {
-                if ($(data).find("div#graded_users_selector").length == 0) {
-                    let fullTable = $(data).find("tbody")[0].innerHTML;
-                    let remove = $(fullTable).find(".text_to_html");
-                    let feedback = $(fullTable).find(".column-feedback");
-                    for (let x = 0; x < feedback.length; x++) {
-                        fullTable = fullTable.replace(feedback[x].innerHTML, "");
-                    }
-                    for (let x = 0; x < remove.length; x++) {
-                        fullTable = fullTable.replace(remove[x], "");
-                    }
-                    document.getElementById("GradesTable").innerHTML += "<table>" + fullTable + "</table><div style = \"width:100%; border-bottom: 1px solid black;\"></div>";
-                }
-            }
-        });
+  function clearTable(){
+    // clear the table before updating it
+    let table = document.getElementById('GradesTable');
+    while (table.firstChild){
+      table.removeChild(table.firstChild);
     }
+  }
+
+  function refreshTable(){
+    clearTable();
+    // read the current set semester (default is most recent one)
+    let semester = document.getElementById('semesters').value;
+    let links = $(`.category_label:contains("${semester}")`).next().children();
+
+    let requests = [];
+    let classurl = 'https://culearn.carleton.ca/moodle/course/view.php?id=';
+
+    // create ajax requests for each class in the semester provided
+    for (let x = 0; x < links.length; x++){
+      links[x] = getUrlParams($(links[x]).find("a")[0].href);
+      requests.push($.ajax({
+        url:"https://culearn.carleton.ca/moodle/grade/report/user/index.php?id="+links[x]['id'],
+        success: function(data){
+
+            // filter out classes (if you are a TA/instructor)
+            if ( $(data).find("div#graded_users_selector").length == 0){
+
+              let org = $(data).find("th.level1:first")[0].innerHTML;
+
+              let linked = `<a href=${classurl+links[x].id}>${org}</a>`;
+
+              console.log(org, linked);
+
+              let fullTable = $(data).find("tbody:first")[0].innerHTML.replace(org, linked);
+              
+              // remove feedback
+              let remove = $(fullTable).find(".column-feedback");
+
+              for (let x = 0; x < remove.length; x++){
+                fullTable = fullTable.replace(remove[x].innerHTML, "");
+              }
+              // add to the table
+              document.getElementById("GradesTable").innerHTML +=  "<table>"+ fullTable + "</table><div style = \"width:100%; border-bottom: 1px solid black;\"></div>";
+              }
+            }
+        })
+      );
+    }
+  }
+
+  let semesters = Array.from(document.getElementsByClassName('category_label')).filter((item)=>{
+    return ['W','S','F'].includes(item.innerHTML.charAt(0));
+  });
+
+  let select = document.getElementById('semesters');
+  for (let x=0; x<semesters.length; x++){
+    let option = document.createElement('option');
+    option.id = x;
+    option.innerHTML = $(semesters[x]).html();
+
+    select.append(option);
+    
+  }
+
+  refreshTable();
+
+  document.getElementById('semesters').addEventListener('change', refreshTable);
 </script>
