@@ -35,15 +35,13 @@
       requests.push($.ajax({
         url:"https://culearn.carleton.ca/moodle/grade/report/user/index.php?id="+links[x]['id'],
         success: function(data){
-
-            // filter out classes (if you are a TA/instructor)
-            if ( $(data).find("div#graded_users_selector").length == 0){
+            // filter out classes (if you are a TA/instructor) and MS-LAP
+            if ( $(data).find("div#graded_users_selector").length == 0 && !$(data).find('h1')[0].innerHTML.includes('MS-LAP')){
 
               let org = $(data).find("th.level1:first")[0].innerHTML;
 
               let linked = `<a href=${classurl+links[x].id}>${org}</a>`;
 
-              console.log(org, linked);
 
               let fullTable = $(data).find("tbody:first")[0].innerHTML.replace(org, linked);
               
