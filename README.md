@@ -14,6 +14,6 @@ The code makes requests to each of the grades pages for your classes for the cur
 6) Click the button that looks like < > html tags to edit your block as HTML
 7) Paste the following   
 ```html
-<script id="GradesScript" src="https://cdn.jsdelivr.net/gh/martindmtrv/cuLearn-grades-block/block.min.js">
+<script id="GradesScript" src="https://cdn.jsdelivr.net/gh/martindmtrv/cuLearn-grades-block@latest/block.min.js">
 ```
 8) Save the changes to your block and profit off saving a couple clicks to see if your class grades have been released yet!
