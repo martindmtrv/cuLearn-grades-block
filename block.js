@@ -1,4 +1,3 @@
-
 function getUrlParams(url) {
     let params = {};
     url.substring(1).replace(/[?&]+([^=&]+)=([^&]*)/gi,
