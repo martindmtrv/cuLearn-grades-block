@@ -1,3 +1,5 @@
+let requests = [];
+
 function getUrlParams(url) {
     let params = {};
     url.substring(1).replace(/[?&]+([^=&]+)=([^&]*)/gi,
@@ -13,6 +15,9 @@ function clearTable() {
     while (table.firstChild) {
         table.removeChild(table.firstChild);
     }
+
+    // cancel ongoing requests
+    requests.forEach(req=>req.abort());
 }
 
 function refreshTable() {
@@ -21,7 +26,6 @@ function refreshTable() {
     let semester = document.getElementById('semesters').value;
     let links = $(`.category_label:contains("${semester}")`).next().children();
 
-    let requests = [];
     let classurl = 'https://culearn.carleton.ca/moodle/course/view.php?id=';
 
     // create ajax requests for each class in the semester provided
